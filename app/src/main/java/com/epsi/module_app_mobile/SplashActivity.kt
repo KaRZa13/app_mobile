@@ -34,7 +34,7 @@ class SplashActivity : BaseActivity() {
         setContent {
             Module_app_mobileTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting6(
+                    SplashScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -49,10 +49,10 @@ class SplashActivity : BaseActivity() {
 }
 
 @Composable
-fun Greeting6(modifier: Modifier = Modifier) {
+fun SplashScreen(modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
-            .background(Color.Black)
+            .background(Color(0xFF261E48))
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
@@ -71,8 +71,8 @@ fun Greeting6(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview6() {
+fun SplashPreview() {
     Module_app_mobileTheme {
-        Greeting6()
+        SplashScreen()
     }
 }
