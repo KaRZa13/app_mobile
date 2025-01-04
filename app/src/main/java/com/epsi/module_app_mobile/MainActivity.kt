@@ -17,8 +17,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,26 +37,52 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val students = listOf(
-            Student("Rafael", "MURO", 24),
-            Student("Colin", "MORLION", 19)
+            Student(
+                firstName = "Rafael",
+                lastName = "MURO",
+                age = 24,
+                email = "rafael.muro@ecoles-epsi.net",
+                optional = "Suppléant délégué, Option Développement, Ambassadeur National",
+                picture = R.drawable.rafael
+            ),
+            Student(
+                firstName = "Colin",
+                lastName = "MORLION",
+                age = 19,
+                email = "colin.morlion@ecoles-epsi.net",
+                optional = "Ambassadeur, Option Développement",
+                picture = R.drawable.colin
+            )
         )
+
 
         setContent {
             Module_app_mobileTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(students) { student ->
-                            CardButton(student)
-                        }
-                    }
+                    MainScreen(students)
                 }
             }
         }
     }
+}
+
+@Composable
+fun MainScreen(students: List<Student>) {
+    Scaffold(
+        content = { innerPadding ->
+            LazyColumn(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                items(students) { student ->
+                    CardButton(student)
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -70,12 +98,14 @@ fun CardButton(student: Student) {
                 putExtra("firstName", student.firstName)
                 putExtra("lastName", student.lastName)
                 putExtra("age", student.age)
+                putExtra("email", student.email)
+                putExtra("optional", student.optional)
+                putExtra("picture", student.picture) // Image
             }
             context.startActivity(intent)
         },
         modifier = Modifier
             .width(buttonWidth)
-            .height(buttonHeight)
             .padding(8.dp),
         colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = purpleBgColor) // Couleur du bouton
     ) {
@@ -96,12 +126,12 @@ fun CardButton(student: Student) {
                     text = student.firstName,
                     color = Color.White,
                     fontWeight = FontWeight.Bold, // Prénom en gras
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     text = student.lastName,
                     color = Color.White,
-                    fontWeight = FontWeight.Bold, // Nom en gras
+                    fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(

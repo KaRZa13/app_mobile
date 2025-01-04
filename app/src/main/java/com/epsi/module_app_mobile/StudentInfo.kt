@@ -1,18 +1,36 @@
 package com.epsi.module_app_mobile
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.epsi.module_app_mobile.ui.theme.Module_app_mobileTheme
 
 class StudentInfo : ComponentActivity() {
@@ -20,42 +38,112 @@ class StudentInfo : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        try {
-            // Récupérez les données envoyées via l'intent
-            val firstName = intent.getStringExtra("firstName") ?: "Prénom inconnu"
-            val lastName = intent.getStringExtra("lastName") ?: "Nom inconnu"
-            val age = intent.getIntExtra("age", -1)
+        // Récupération des données envoyées via Intent
+        val firstName = intent.getStringExtra("firstName") ?: "Nom inconnu"
+        val lastName = intent.getStringExtra("lastName") ?: "Prénom inconnu"
+        val age = intent.getIntExtra("age", 0)
+        val email = intent.getStringExtra("email") ?: "Email inconnu"
+        val option = intent.getStringExtra("optional") ?: "Option inconnue"
+        val picture = intent.getIntExtra("picture", R.drawable.defaultpic) // Image par défaut
 
-            if (age == -1) {
-                Log.e("StudentInfo", "Age is missing!")
-                finish() // Fermer l'activité si les données sont invalides
-                return
-            }
-
-            setContent {
-                Module_app_mobileTheme {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        StudentDetails(
+        setContent {
+            Module_app_mobileTheme {
+                Scaffold(
+                    content = { innerPadding ->
+                        StudentInfoContent(
                             firstName = firstName,
                             lastName = lastName,
                             age = age,
+                            email = email,
+                            option = option,
+                            picture = picture,
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
-                }
+                )
             }
-        } catch (e: Exception) {
-            Log.e("StudentInfo", "Failed to retrieve student data", e)
-            finish() // Fermer l'activité en cas d'erreur
         }
     }
 }
 
 @Composable
-fun StudentDetails(firstName: String, lastName: String, age: Int, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(16.dp)) {
-        Text(text = "Prénom : $firstName")
-        Text(text = "Nom : $lastName")
-        Text(text = "Âge : $age ans")
+fun StudentInfoContent(
+    firstName: String,
+    lastName: String,
+    age: Int,
+    email: String,
+    option: String,
+    picture: Int,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current // Pour gérer le clic sur le lien
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        // Image de l'étudiant
+        Image(
+            painter = painterResource(id = picture),
+            contentDescription = "Photo de $firstName $lastName",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(150.dp)
+                .padding(top = 16.dp)
+        )
+
+        // Prénom, nom et âge
+        Text(
+            text = "$firstName $lastName, $age ans",
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // Email
+        Text(
+            text = email,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+
+        // Option centrée
+        Spacer(modifier = Modifier.height(16.dp)) // Espace au-dessus de l'option
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = option,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Gray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+
+        // Lien URL
+        Spacer(modifier = Modifier.height(16.dp)) // Espace au-dessus du lien
+        Text(
+            text = "https://www.epsi.fr/",
+            fontSize = 16.sp,
+            color = Color.Blue,
+            textDecoration = TextDecoration.Underline,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .clickable {
+                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.epsi.fr/"))
+                    context.startActivity(browserIntent)
+                }
+        )
     }
 }
+
