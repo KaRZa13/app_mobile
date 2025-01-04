@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">module_app_mobile</string>
     <string name="title_activity_splash">SplashActivity</string>
+    <string name="name_student1">Rafael</string>
+    <string name="name_student2">Colin</string>
+
 </resources>
