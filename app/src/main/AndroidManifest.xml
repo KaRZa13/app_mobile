@@ -35,6 +35,7 @@
         </activity>
         <activity android:name=".StudentInfo" />
         <activity android:name=".StudentsActivity" />
+        <activity android:name=".ProductsActivity" />
     </application>
 
 </manifest>
