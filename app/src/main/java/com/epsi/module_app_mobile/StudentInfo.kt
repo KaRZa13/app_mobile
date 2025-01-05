@@ -83,7 +83,7 @@ fun StudentInfoContent(
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Center
     ) {
         // Image de l'étudiant
         Image(
