@@ -1,11 +1,15 @@
 package com.epsi.module_app_mobile
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,6 +34,7 @@ class ProductsListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Retrieve the products_url passed from ProductsActivity
         val productsUrl = intent.getStringExtra("products_url") ?: ""
 
         setContent {
@@ -71,7 +76,7 @@ fun ProductsListScreen(modifier: Modifier = Modifier, productsUrl: String, activ
                 if (data != null) {
                     try {
                         val jsonResponse = JSONObject(data)
-                        val jsonArray = jsonResponse.optJSONArray("record") // Adjusted to use 'record'
+                        val jsonArray = jsonResponse.optJSONArray("record")
                         if (jsonArray != null && jsonArray.length() > 0) {
                             for (i in 0 until jsonArray.length()) {
                                 val jsonObject = jsonArray.getJSONObject(i)
@@ -79,7 +84,7 @@ fun ProductsListScreen(modifier: Modifier = Modifier, productsUrl: String, activ
                                     id = i.toString(),
                                     name = jsonObject.optString("name", ""),
                                     description = jsonObject.optString("description", ""),
-                                    imageUrl = jsonObject.optString("picture_url", "") // Extract picture_url
+                                    imageUrl = jsonObject.optString("picture_url", "")
                                 )
                                 products.add(product)
                             }
@@ -105,9 +110,7 @@ fun ProductsListScreen(modifier: Modifier = Modifier, productsUrl: String, activ
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
         Text(
             text = "Produits",
@@ -119,12 +122,20 @@ fun ProductsListScreen(modifier: Modifier = Modifier, productsUrl: String, activ
         if (productsState.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.padding(16.dp))
         } else {
+            // Add scroll support for long lists
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(productsState.size) { index ->
-                    ProductItem(product = productsState[index])
+                    CompactProductItem(product = productsState[index]) { selectedProduct ->
+                        // Navigate to ProductDetailsActivity on click
+                        val intent = Intent(activity, ProductDetailsActivity::class.java)
+                        intent.putExtra("product_name", selectedProduct.name)
+                        intent.putExtra("product_description", selectedProduct.description)
+                        intent.putExtra("product_image_url", selectedProduct.imageUrl)
+                        activity.startActivity(intent)
+                    }
                 }
             }
         }
@@ -132,17 +143,18 @@ fun ProductsListScreen(modifier: Modifier = Modifier, productsUrl: String, activ
 }
 
 @Composable
-fun ProductItem(product: Product) {
+fun CompactProductItem(product: Product, onClick: (Product) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .height(120.dp),
-        horizontalArrangement = Arrangement.Start
+            .clickable { onClick(product) },
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         // Product Image
         AsyncImage(
-            model = product.imageUrl, // Fetch the image from picture_url
+            model = product.imageUrl,
             contentDescription = "Product Image",
             modifier = Modifier
                 .size(120.dp)
@@ -152,22 +164,22 @@ fun ProductItem(product: Product) {
         // Product Details
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
         ) {
             // Product Name
             Text(
                 text = product.name,
                 style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                modifier = Modifier.padding(bottom = 4.dp)
+                maxLines = 1
             )
 
             // Product Description
             Text(
                 text = product.description,
-                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                maxLines = 2,
-                modifier = Modifier.padding(bottom = 4.dp)
+                style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                maxLines = 2
             )
         }
     }

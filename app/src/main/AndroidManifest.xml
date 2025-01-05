@@ -38,6 +38,7 @@
         <activity android:name=".StudentsActivity" />
         <activity android:name=".ProductsActivity" />
         <activity android:name=".ProductsListActivity" />
+        <activity android:name=".ProductDetailsActivity" />
     </application>
 
 </manifest>
