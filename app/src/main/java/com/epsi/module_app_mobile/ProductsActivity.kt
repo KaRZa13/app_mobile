@@ -13,7 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.epsi.module_app_mobile.ui.theme.Module_app_mobileTheme
 import okhttp3.CacheControl
@@ -30,7 +32,7 @@ class ProductsActivity : ComponentActivity() {
         setContent {
             Module_app_mobileTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ProductsScreen(modifier = Modifier.padding(innerPadding))
+                    ProductsScreen(modifier = Modifier.padding(innerPadding), this)
                 }
             }
         }
@@ -38,7 +40,7 @@ class ProductsActivity : ComponentActivity() {
 }
 
 @Composable
-fun ProductsScreen(modifier: Modifier = Modifier) {
+fun ProductsScreen(modifier: Modifier = Modifier, activity: ComponentActivity) {
     val categoriesState = remember { mutableStateListOf<Category>() }
     val categories = arrayListOf<Category>()
 
@@ -60,63 +62,76 @@ fun ProductsScreen(modifier: Modifier = Modifier) {
             override fun onResponse(call: okhttp3.Call, response: Response) {
                 val data = response.body?.string()
                 if (data != null) {
-                    val jsonResponse = JSONObject(data)
-                    val jsonArray = jsonResponse.getJSONArray("record")
-                    for (i in 0 until jsonArray.length()) {
-                        val jsonObject = jsonArray.getJSONObject(i)
-                        val category = Category(
-                            categoryId = jsonObject.optString("category_id", ""),
-                            title = jsonObject.optString("title", ""),
-                            productsUrl = jsonObject.optString("products_url", "")
-                        )
-                        categories.add(category)
+                    try {
+                        val jsonResponse = JSONObject(data)
+                        val jsonArray = jsonResponse.getJSONArray("record")
+                        for (i in 0 until jsonArray.length()) {
+                            val jsonObject = jsonArray.getJSONObject(i)
+                            val category = Category(
+                                categoryId = jsonObject.optString("category_id", ""),
+                                title = jsonObject.optString("title", ""),
+                                productsUrl = jsonObject.optString("products_url", "")
+                            )
+                            categories.add(category)
+                        }
+                        // Mise à jour des données sur le thread principal
+                        activity.runOnUiThread {
+                            categoriesState.addAll(categories)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("Error", "JSON Parsing Error: ${e.message}")
                     }
-                    categoriesState.addAll(categories)
-                    Log.d("categories", categories.count().toString())
                 }
             }
         })
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        Button(onClick = {
-            if (categoriesState.isNotEmpty()) {
-                categoriesState.removeAt(0)
-            }
-        }) {
-            Text(text = "Supprimer un Rayon")
-        }
+    // Interface utilisateur
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Rayons",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+        )
 
         if (categoriesState.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.padding(16.dp))
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(categoriesState.size) { index ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Rayon: ${categoriesState[index].title}",
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                        Text(
-                            text = "ID: ${categoriesState[index].categoryId}",
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                        Text(
-                            text = "URL: ${categoriesState[index].productsUrl}",
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
+                    RayonButton(category = categoriesState[index])
                 }
             }
         }
+    }
+}
+
+@Composable
+fun RayonButton(category: Category) {
+    Button(
+        onClick = {
+            Log.d("Rayon", "Clicked on ${category.title}")
+            // Action à exécuter lorsqu'un bouton est cliqué (par exemple : naviguer)
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+    ) {
+        Text(
+            text = category.title,
+            style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
