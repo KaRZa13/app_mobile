@@ -20,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +41,7 @@ class StudentsActivity : ComponentActivity() {
                 lastName = "MURO",
                 age = 24,
                 email = "rafael.muro@ecoles-epsi.net",
-                optional = "Suppléant délégué, Option Développement, Ambassadeur National",
+                optional = "Ambassadeur national, Délégué suppléant, Option développement",
                 picture = R.drawable.rafael
             ),
             Student(
@@ -50,7 +49,7 @@ class StudentsActivity : ComponentActivity() {
                 lastName = "MORLION",
                 age = 19,
                 email = "colin.morlion@ecoles-epsi.net",
-                optional = "Ambassadeur, Option Développement",
+                optional = "Ambassadeur, Option développement",
                 picture = R.drawable.colin
             )
         )
@@ -88,10 +87,9 @@ fun MainScreen(students: List<Student>) {
 @Composable
 fun CardButton(student: Student) {
     val context = LocalContext.current
-    val buttonWidth = 300.dp // Largeur des boutons
-    val buttonHeight = 150.dp // Hauteur des boutons
-    val purpleBgColor = colorResource(id = R.color.purple_bg) // Couleur définie dans color.xml
-
+    val buttonWidth = 300.dp
+    val buttonHeight = 150.dp
+    val purpleBgColor = colorResource(id = R.color.purple_bg)
     Button(
         onClick = {
             val intent = Intent(context, StudentInfo::class.java).apply {
@@ -100,32 +98,32 @@ fun CardButton(student: Student) {
                 putExtra("age", student.age)
                 putExtra("email", student.email)
                 putExtra("optional", student.optional)
-                putExtra("picture", student.picture) // Image
+                putExtra("picture", student.picture)
             }
             context.startActivity(intent)
         },
         modifier = Modifier
             .width(buttonWidth)
             .padding(8.dp),
-        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = purpleBgColor) // Couleur du bouton
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = purpleBgColor)
     ) {
         Card(
             modifier = Modifier
                 .width(buttonWidth)
                 .height(buttonHeight),
-            colors = CardDefaults.cardColors(containerColor = purpleBgColor) // Couleur de la carte
+            colors = CardDefaults.cardColors(containerColor = purpleBgColor)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center // Centrer le contenu verticalement
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = student.firstName,
                     color = Color.White,
-                    fontWeight = FontWeight.Bold, // Prénom en gras
+                    fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
@@ -133,11 +131,6 @@ fun CardButton(student: Student) {
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge
-                )
-                Text(
-                    text = "${student.age} ans",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }

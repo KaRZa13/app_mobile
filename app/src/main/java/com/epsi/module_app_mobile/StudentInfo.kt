@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,13 +37,12 @@ class StudentInfo : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Récupération des données envoyées via Intent
         val firstName = intent.getStringExtra("firstName") ?: "Nom inconnu"
         val lastName = intent.getStringExtra("lastName") ?: "Prénom inconnu"
         val age = intent.getIntExtra("age", 0)
         val email = intent.getStringExtra("email") ?: "Email inconnu"
         val option = intent.getStringExtra("optional") ?: "Option inconnue"
-        val picture = intent.getIntExtra("picture", R.drawable.defaultpic) // Image par défaut
+        val picture = intent.getIntExtra("picture", R.drawable.defaultpic)
 
         setContent {
             Module_app_mobileTheme {
@@ -76,7 +74,7 @@ fun StudentInfoContent(
     picture: Int,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current // Pour gérer le clic sur le lien
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -85,7 +83,7 @@ fun StudentInfoContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Image de l'étudiant
+
         Image(
             painter = painterResource(id = picture),
             contentDescription = "Photo de $firstName $lastName",
@@ -95,26 +93,37 @@ fun StudentInfoContent(
                 .padding(top = 16.dp)
         )
 
-        // Prénom, nom et âge
         Text(
-            text = "$firstName $lastName, $age ans",
+            text = "$firstName $lastName",
             fontWeight = FontWeight.Bold,
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp)
         )
+        Text(
+            text = "$age ans",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp)
+        )
 
-        // Email
         Text(
             text = email,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .clickable {
+                    val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:$email")
+                    }
+                    context.startActivity(emailIntent)
+                }
         )
 
-        // Option centrée
-        Spacer(modifier = Modifier.height(16.dp)) // Espace au-dessus de l'option
+        Spacer(modifier = Modifier.height(16.dp))
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -129,8 +138,7 @@ fun StudentInfoContent(
             )
         }
 
-        // Lien URL
-        Spacer(modifier = Modifier.height(16.dp)) // Espace au-dessus du lien
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "https://www.epsi.fr/",
             fontSize = 16.sp,

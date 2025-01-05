@@ -8,8 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,7 +32,6 @@ class ProductsListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Retrieve the products_url passed from ProductsActivity
         val productsUrl = intent.getStringExtra("products_url") ?: ""
 
         setContent {
@@ -129,7 +126,6 @@ fun ProductsListScreen(modifier: Modifier = Modifier, productsUrl: String, activ
             ) {
                 items(productsState.size) { index ->
                     CompactProductItem(product = productsState[index]) { selectedProduct ->
-                        // Navigate to ProductDetailsActivity on click
                         val intent = Intent(activity, ProductDetailsActivity::class.java)
                         intent.putExtra("product_name", selectedProduct.name)
                         intent.putExtra("product_description", selectedProduct.description)
@@ -152,7 +148,6 @@ fun CompactProductItem(product: Product, onClick: (Product) -> Unit) {
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Product Image
         AsyncImage(
             model = product.imageUrl,
             contentDescription = "Product Image",
@@ -161,21 +156,19 @@ fun CompactProductItem(product: Product, onClick: (Product) -> Unit) {
                 .padding(end = 8.dp)
         )
 
-        // Product Details
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            // Product Name
+
             Text(
                 text = product.name,
                 style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
                 maxLines = 1
             )
 
-            // Product Description
             Text(
                 text = product.description,
                 style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
@@ -189,5 +182,5 @@ data class Product(
     val id: String,
     val name: String,
     val description: String,
-    val imageUrl: String // Field for picture_url from the API
+    val imageUrl: String
 )

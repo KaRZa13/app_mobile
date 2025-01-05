@@ -53,7 +53,7 @@ fun MainScreen() {
             },
             modifier = Modifier.padding(8.dp)
         ) {
-            Text(text = "Voir les Étudiants")
+            Text(text = "Voir les étudiants")
         }
 
         Button(
@@ -63,7 +63,7 @@ fun MainScreen() {
             },
             modifier = Modifier.padding(8.dp)
         ) {
-            Text(text = "Voir les Produits")
+            Text(text = "Voir les produits")
         }
     }
 }

@@ -20,7 +20,6 @@ class ProductDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Retrieve product details from intent
         val productName = intent.getStringExtra("product_name") ?: "Unknown Product"
         val productDescription = intent.getStringExtra("product_description") ?: "No description available"
         val productImageUrl = intent.getStringExtra("product_image_url") ?: ""
@@ -47,16 +46,16 @@ fun ProductDetailsScreen(
     productImageUrl: String,
     modifier: Modifier = Modifier
 ) {
-    // Enable vertical scrolling
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState()), // Add vertical scroll
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Product Name (Top)
+
         Text(
             text = productName,
             style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
@@ -64,7 +63,7 @@ fun ProductDetailsScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Product Image
+
         AsyncImage(
             model = productImageUrl,
             contentDescription = "Product Image",
@@ -73,7 +72,6 @@ fun ProductDetailsScreen(
                 .height(300.dp)
         )
 
-        // Product Name (Below Image)
         Text(
             text = productName,
             style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
@@ -81,7 +79,6 @@ fun ProductDetailsScreen(
             textAlign = TextAlign.Center
         )
 
-        // Product Description
         Text(
             text = "Description:\n$productDescription",
             style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
