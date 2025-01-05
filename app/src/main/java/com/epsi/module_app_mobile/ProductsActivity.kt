@@ -1,5 +1,6 @@
 package com.epsi.module_app_mobile
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -15,6 +16,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.epsi.module_app_mobile.ui.theme.Module_app_mobileTheme
@@ -44,19 +46,18 @@ fun ProductsScreen(modifier: Modifier = Modifier, activity: ComponentActivity) {
     val categoriesState = remember { mutableStateListOf<Category>() }
     val categories = arrayListOf<Category>()
 
-    // Récupérer les catégories depuis l'API si la liste est vide
     if (categoriesState.isEmpty()) {
         val okHttpClient: OkHttpClient = OkHttpClient.Builder().build()
-        val mRequestUrl = "https://api.jsonbin.io/v3/b/6760342bacd3cb34a8ba8657"
+        val apiUrl = "https://api.jsonbin.io/v3/b/6760342bacd3cb34a8ba8657"
         val request = Request.Builder()
-            .url(mRequestUrl)
+            .url(apiUrl)
             .get()
             .cacheControl(CacheControl.FORCE_NETWORK)
             .build()
 
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: okhttp3.Call, e: IOException) {
-                Log.e("Error", e.toString())
+                Log.e("Error", "Failed to fetch categories: ${e.message}")
             }
 
             override fun onResponse(call: okhttp3.Call, response: Response) {
@@ -74,7 +75,6 @@ fun ProductsScreen(modifier: Modifier = Modifier, activity: ComponentActivity) {
                             )
                             categories.add(category)
                         }
-                        // Mise à jour des données sur le thread principal
                         activity.runOnUiThread {
                             categoriesState.addAll(categories)
                         }
@@ -86,7 +86,6 @@ fun ProductsScreen(modifier: Modifier = Modifier, activity: ComponentActivity) {
         })
     }
 
-    // Interface utilisateur
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -118,10 +117,12 @@ fun ProductsScreen(modifier: Modifier = Modifier, activity: ComponentActivity) {
 
 @Composable
 fun RayonButton(category: Category) {
+    val context = LocalContext.current
     Button(
         onClick = {
-            Log.d("Rayon", "Clicked on ${category.title}")
-            // Action à exécuter lorsqu'un bouton est cliqué (par exemple : naviguer)
+            val intent = Intent(context, ProductsListActivity::class.java)
+            intent.putExtra("products_url", category.productsUrl)
+            context.startActivity(intent)
         },
         modifier = Modifier
             .fillMaxWidth()
